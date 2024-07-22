@@ -3,6 +3,9 @@ import {UploadOutlined, UserOutlined, VideoCameraOutlined, HomeOutlined} from '@
 import {Breadcrumb, Layout, Menu, theme} from 'antd';
 import './MainPage.css';
 import { MENU_HOME, MENU_VISUALIZATION, MENU_MNGE, MENU_SEGMENTATION } from './../../constant';
+import UploadContent from "../UploadContent/UploadContent";
+import ManagementContent from "../ManagementContent/ManagementContent";
+import VisualizationContent from "../VisualizationContent/VisualizationContent";
 
 const {Header, Content, Footer, Sider} = Layout;
 const items = [
@@ -24,7 +27,7 @@ const items = [
     },
     {
         key: MENU_SEGMENTATION,
-        label: 'Segmentation',
+        label: 'Prediction',
         icon: <UploadOutlined/>,
     },
 ];
@@ -60,17 +63,23 @@ const MainPage = () => {
                     top: 0,
                     zIndex: 1,
                     width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
+                    // display: 'flex',
+                    // alignItems: 'center',
+                    // minHeight:"12vh",
+                    // margin: 0,
+                    // padding: 0,
                 }}
             >
+                {/*<div style={{width:"100%", height: '7vh', color:"white", margin:"0"}}>*/}
+                {/*    <h1 style={{position:"absolute", left: "3vw"}}>AIMS-TBI</h1>*/}
+                {/*</div>*/}
                 <div className="demo-logo"/>
                 <Menu
                     theme="dark"
                     mode="horizontal"
                     defaultSelectedKeys={['2']}
                     items={items}
-                    style={{flex: 1, minWidth: 0}}
+                    style={{flex: 1, Width: "5vh"}}
                     onClick={handleMenuClick}
                 />
             </Header>
@@ -87,9 +96,9 @@ const MainPage = () => {
                     }}
                 >
                     {activeMenu === MENU_HOME && <IntroContent/>}
-                    {activeMenu === MENU_VISUALIZATION && <div>Data Visualization Content</div>}
-                    {activeMenu === MENU_MNGE && <div>Management Content</div>}
-                    {activeMenu === MENU_SEGMENTATION && <div>Segmentation Content</div>}
+                    {activeMenu === MENU_VISUALIZATION && <VisualizationContent/>}
+                    {activeMenu === MENU_MNGE && <ManagementContent/>}
+                    {activeMenu === MENU_SEGMENTATION && <UploadContent/>}
 
                 </div>
             </Content>
