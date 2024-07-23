@@ -1,44 +1,143 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import { InboxOutlined } from '@ant-design/icons';
-import {Checkbox, message, Radio, Upload} from 'antd';
+import {Alert, Checkbox, message, Radio, Result, Spin, Upload, UploadProps} from 'antd';
 import './UploadContent.css';
 import { Button, Form, Input, Select, Space } from 'antd';
 
 
 const { Dragger } = Upload;
 
-const props = {
-    name: 'file',
-    multiple: true,
-    action: 'https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload',
-    onChange(info) {
-        const { status } = info.file;
-        if (status !== 'uploading') {
-            console.log(info.file, info.fileList);
-        }
-        if (status === 'done') {
-            message.success(`${info.file.name} file uploaded successfully.`);
-        } else if (status === 'error') {
-            message.error(`${info.file.name} file upload failed.`);
-        }
-    },
-    onDrop(e) {
-        console.log('Dropped files', e.dataTransfer.files);
-    },
-};
-
-const onFinish = (values) => {
-    message.success("Submit successfully");
-    console.log('Success:', values);
-};
-const onFinishFailed = (errorInfo) => {
-    message.error("Submit failed");
-    console.log('Failed:', errorInfo);
-};
-
 
 const UploadContent = () => {
+
+
+    const baseURL = process.env.REACT_APP_API_BASE_URL;
+
+    const [fileList, setFileList] = useState([]);
+    const [otherDataReady, setOtherDataReady] = useState(false);
+    const [modelData, setModelData] = useState([]);
+    const [scanData, setScanData] = useState([]);
+    const [manufacturerSelect, setManufacturerSelect] = useState([]);
+    const [modelSelect, setModelSelect] = useState([]);
+    const [resultType, setResultType] = useState(-1);
+    const [loading, setLoading] = React.useState(false);
+
+
+    const fetchModelData = () => {
+        fetch(`${baseURL}/models`)
+            .then(response => response.json())
+            .then(data => {
+                    setModelData(data);
+                    setModelSelect(data.map(item => ({
+                        value: String(item.id),
+                        label: item.name
+                    })));
+            }
+            )
+            .catch(error => {
+                console.error("There was an error fetching the model data!", error);
+            });
+    };
+
+    const fetchScanData = () => {
+        fetch(`${baseURL}/manufacturers`)
+            .then(response => response.json())
+            .then(data => {
+                setScanData(data);
+                setManufacturerSelect(data.map(item => ({
+                    value: String(item.id),
+                    label: item.brand
+                })));
+
+            })
+            .catch(error => {
+                console.error("There was an error fetching the scan data!", error);
+            });
+    };
+
+    const handleUpload = async (values) => {
+        if (fileList.length === 0) {
+            message.error('No file selected.');
+            return;
+        }
+
+        const formData = new FormData();
+        // fileList.forEach((file) => {
+        //     formData.append('file', file);
+        // });
+        formData.append('file', fileList[0])
+        formData.append('age', values.age);
+        formData.append('tsi', values.tsi);
+        formData.append('gender', values.gender);
+        formData.append('manufacturer', values.manufacturer);
+        formData.append('model', values.model);
+
+        try {
+            setLoading(true);
+            const response = await fetch(baseURL + '/prediction', {
+                method: 'POST',
+                body: formData,
+            });
+            const result = await response.json();
+            if (response.ok) {
+                message.success('Files and data uploaded successfully.');
+                setResultType(result.result)
+                console.log(result);
+                setFileList([]);
+                setLoading(false);
+            } else {
+                message.error('Failed to upload files and data.');
+                setLoading(false);
+            }
+            setFileList([]);
+        } catch (error) {
+            message.error('Failed to upload files and data.');
+            setLoading(false);
+        }
+    };
+
+    const props = {
+        name: 'file',
+        multiple: false,
+        beforeUpload: file => {
+            setFileList(prevList => [...prevList, file]);
+            return false; // Prevent automatic upload
+        },
+        onRemove: file => {
+            setFileList(prevList => prevList.filter(item => item.uid !== file.uid));
+        },
+        fileList,
+        onDrop(e) {
+            console.log('Dropped files', e.dataTransfer.files);
+        },
+    };
+
+    const onFinish = (values) => {
+        if (fileList.length === 0) {
+            message.error("Please add the .nii file");
+            return;
+        }
+        // message.success("Submit successfully");
+        handleUpload(values);
+        console.log('Success:', values);
+
+    };
+    const onFinishFailed = (errorInfo) => {
+        message.error("Submit failed");
+        console.log('Failed:', errorInfo);
+    };
+
+    useEffect(() => {
+        fetchModelData();
+        fetchScanData();
+    }, [baseURL]);
+
+
     return (
+        <div>
+            {/*<Alert message="Success Text" type="success" />*/}
+
+
         <div className={"upload-container"}>
             <div className={"upload-card"}>
                 <Dragger {...props}>
@@ -126,11 +225,24 @@ const UploadContent = () => {
                             // defaultValue="1"
                             style={{  }}
                             // onChange={handleChange}
-                            options={[
-                                { value: '1', label: 'Siemens' },
-                                { value: '2', label: 'Philips' },
-                                { value: '3', label: 'GE' },
-                            ]}
+                            options={manufacturerSelect}
+                        />
+                    </Form.Item>
+                    <Form.Item
+                        label="Model"
+                        name="model"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Please select',
+                            },
+                        ]}
+                    >
+                        <Select
+                            // defaultValue="1"
+                            style={{  }}
+                            // onChange={handleChange}
+                            options={modelSelect}
                         />
                     </Form.Item>
 
@@ -146,10 +258,33 @@ const UploadContent = () => {
                     </Form.Item>
                 </Form>
             </div>
-            <div className={"upload-card"}>
+            <div className={"upload-card"} style={{alignContent: "center", justifyContent: "center", alignItems: "center"}}>
+                <Spin spinning={loading}>
+                {resultType === -1 && <Result
+                    title="Waiting for your input"
 
+                />}
+
+                {resultType === 0 && <Result
+                    status="success"
+                    // title="The prediction results showed that there was a high probability that the lesion would not be present in the MRI image"
+                    subTitle="The prediction results showed that there was a high probability that the lesion would not be present in the MRI image"
+                    extra={[
+
+                    ]}
+                />}
+                {resultType === 1 && <Result
+                    status="warning"
+                    // title="The prediction results showed that there was a high probability that the lesion would not be present in the MRI image"
+                    subTitle="The prediction results showed that there was a high probability that the lesion exists in the MRI image"
+                    extra={[
+
+                    ]}
+                />}
+                </Spin>
             </div>
 
+        </div>
         </div>
     );
 }

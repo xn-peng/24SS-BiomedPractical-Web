@@ -33,16 +33,43 @@ const items = [
 ];
 
 const IntroContent = () => {
-   return (<div style={{display: 'flex', justifyContent: 'left', flexDirection: "column", alignItems: 'center'}}>
-       <h1>AIMS-TBI</h1>
-       <p>Hello world</p>
-       <h2>Introduction</h2>
-       <p>Hello world</p>
-       <h2>About this website</h2>
-       <p>Hello world</p>
-       <h2>How to use</h2>
-       <p>Hello world</p>
-   </div>)
+   return (
+       <div>
+           {/*<div className={"left"}>*/}
+           {/*    <img src={"https://rumc-gcorg-p-public.s3.amazonaws.com/b/762/AIMS-TBI.x15.jpeg"} alt={"https://aims-tbi.grand-challenge.org/"}/>*/}
+           {/*    <p style={{color: "white",  transform: "translateY(-5vh)"}}>Image Copyright @ https://aims-tbi.grand-challenge.org/</p>*/}
+           {/*</div>*/}
+           <div className={"right"}>
+               <div style={{display: 'flex', justifyContent: 'left', flexDirection: "column", alignItems: 'center'}}>
+                   <h1>MRI lesion segmentation using T1-weighted MRI scans in traumatic brain injury</h1>
+                   <p>Moderate to Severe Traumatic Brain Injury arises from severe impacts to the head, leading to
+                       complex lesions
+                       that pose diagnostic challenges with conventional imaging techniques. To address this, our team
+                       participated
+                       in the AIMS-TBI segmentation challenge, utilizing T1-weighted and corresponding labeled lesion
+                       MRI data to
+                       facilitate automated lesion detection. We implemented machine learning approaches, including 2D
+                       and 3D models
+                       such as U-net and V-net, to more effectively process and segment these intricate patterns. This
+                       report
+                       details our training approaches, discusses modifications to our models, and introduces a software
+                       demo that
+                       highlights potential enhancements in the diagnostic process for msTBI.</p>
+                   {/*<h2>Introduction</h2>*/}
+                   {/*<p>Hello world</p>*/}
+                   <h2>About this website</h2>
+                   <h3>Visualization</h3>
+                   <p>Visualize nii file.</p>
+                   <h3>Management</h3>
+                   <p>Manage lists of models and manufacturers</p>
+                   <h3>Prediction</h3>
+                   <p>Perform prediction task with diag data and nii file.</p>
+                   {/*<h2>How to use</h2>*/}
+                   {/*<p>Hello world</p>*/}
+               </div>
+           </div>
+       </div>
+   )
 };
 
 const MainPage = () => {
@@ -103,7 +130,7 @@ const MainPage = () => {
                 </div>
             </Content>
             <Footer style={{textAlign: 'center'}}>
-                TBI Segmentation ©{new Date().getFullYear()} Created by Peng, Yu, Zeng.
+                MRI Lesion Detection ©{new Date().getFullYear()} Created by Peng, Yu, Zeng.
             </Footer>
         </Layout>
     );
