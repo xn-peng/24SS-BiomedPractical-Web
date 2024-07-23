@@ -62,9 +62,6 @@ const UploadContent = () => {
         }
 
         const formData = new FormData();
-        // fileList.forEach((file) => {
-        //     formData.append('file', file);
-        // });
         formData.append('file', fileList[0])
         formData.append('age', values.age);
         formData.append('tsi', values.tsi);
@@ -135,9 +132,6 @@ const UploadContent = () => {
 
     return (
         <div>
-            {/*<Alert message="Success Text" type="success" />*/}
-
-
         <div className={"upload-container"}>
             <div className={"upload-card"}>
                 <Dragger {...props}>
@@ -267,19 +261,11 @@ const UploadContent = () => {
 
                 {resultType === 0 && <Result
                     status="success"
-                    // title="The prediction results showed that there was a high probability that the lesion would not be present in the MRI image"
                     subTitle="The prediction results showed that there was a high probability that the lesion would not be present in the MRI image"
-                    extra={[
-
-                    ]}
                 />}
                 {resultType === 1 && <Result
                     status="warning"
-                    // title="The prediction results showed that there was a high probability that the lesion would not be present in the MRI image"
                     subTitle="The prediction results showed that there was a high probability that the lesion exists in the MRI image"
-                    extra={[
-
-                    ]}
                 />}
                 </Spin>
             </div>

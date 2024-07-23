@@ -8,9 +8,6 @@ import { UploadProps } from 'antd/lib/upload';
 
 const { Dragger } = Upload;
 
-
-
-
 const VisualizationContent = (props) => {
     const baseURL = process.env.REACT_APP_API_BASE_URL;
     const [uploadKey, setUploadKey] = useState(Date.now()); // 用于强制刷新Upload组件
