@@ -5,7 +5,7 @@ import datetime
 from flask_cors import CORS
 from processing.process_nii import process_nii_file
 
-from prediction.UNET.run import unet_run
+from prediction.UNET.run import run
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
 
 app = Flask(__name__)
@@ -18,9 +18,7 @@ CORS(app)  # 启用CORS
 def read_model_list():
     model_file_path = os.path.join('model', 'model.csv')
     df = pd.read_csv(model_file_path)
-    # 转换DataFrame为字典列表
     model_list = df.to_dict(orient='records')
-    # 调整每个item的格式
     formatted_list = [
         {"id": item['id'], "name": item['name'], "time": item['time']}
         for item in model_list
@@ -31,9 +29,7 @@ def read_model_list():
 def read_manufacturer_list():
     manufacturer_file_path = os.path.join('data', 'manufacturer.csv')
     df = pd.read_csv(manufacturer_file_path)
-    # 转换DataFrame为字典列表
     manufacturer_list = df.to_dict(orient='records')
-    # 调整每个item的格式
     formatted_list = [
         {"id": item['id'], "model": item['model'], "brand": item['brand']}
         for item in manufacturer_list
@@ -44,7 +40,6 @@ def read_manufacturer_list():
 def delete_manufacturer_by_id(manufacturer_id):
     manufacturer_file_path = os.path.join('data', 'manufacturer.csv')
     df = pd.read_csv(manufacturer_file_path)
-    # 检查ID是否存在
     if manufacturer_id not in df['id'].values:
         return False
     df = df[df['id'] != manufacturer_id]
@@ -82,7 +77,6 @@ def delete_model_by_id(model_id):
     except PermissionError:
         return False, "Permission denied while reading the file."
 
-    # 检查ID是否存在
     if model_id not in df['id'].values:
         return False, "ID not found."
 
@@ -94,7 +88,6 @@ def delete_model_by_id(model_id):
     except PermissionError:
         return False, "Permission denied while writing to the file."
 
-    # 删除对应的.pth文件
     pth_file_path = os.path.join('model', f"{model_name}.pth")
     try:
         if os.path.exists(pth_file_path):
@@ -274,7 +267,7 @@ def prediction():
 
         if model:
             print(gender)
-            has_lesion = unet_run(file_path, float(age), int(sex), float(tsi), manufacturer, model)
+            has_lesion = run(file_path, float(age), int(sex), float(tsi), manufacturer, model)
             return jsonify({"result": int(has_lesion)}), 200
         else:
             return jsonify({"error": "Unsupported model ID"}), 400
